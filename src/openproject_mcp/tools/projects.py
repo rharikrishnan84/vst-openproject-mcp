@@ -1,0 +1,94 @@
+from mcp.server.fastmcp import FastMCP
+
+from openproject_mcp.client import OpenProjectClient
+
+
+def register(mcp: FastMCP, client: OpenProjectClient) -> None:
+
+    @mcp.tool()
+    async def list_projects(page: int = 1, page_size: int = 25) -> dict:
+        """List all projects accessible to the current user.
+
+        Args:
+            page: Page number (starts at 1).
+            page_size: Number of results per page (max 200).
+        """
+        return await client.get("/api/v3/projects", params={"offset": page, "pageSize": page_size})
+
+    @mcp.tool()
+    async def get_project(project_id: str) -> dict:
+        """Get details of a single project by its numeric ID or string identifier.
+
+        Args:
+            project_id: Numeric project ID or string identifier (e.g. 'my-project').
+        """
+        return await client.get(f"/api/v3/projects/{project_id}")
+
+    @mcp.tool()
+    async def create_project(
+        name: str,
+        identifier: str,
+        description: str | None = None,
+        parent_id: int | None = None,
+        public: bool = False,
+    ) -> dict:
+        """Create a new project.
+
+        Args:
+            name: Display name of the project.
+            identifier: URL-friendly unique identifier (lowercase, hyphens allowed).
+            description: Optional project description.
+            parent_id: Optional numeric ID of parent project for sub-projects.
+            public: Whether the project is publicly visible.
+        """
+        body: dict = {
+            "name": name,
+            "identifier": identifier,
+            "public": public,
+        }
+        if description:
+            body["description"] = {"raw": description}
+        if parent_id:
+            body["_links"] = {"parent": {"href": f"/api/v3/projects/{parent_id}"}}
+        return await client.post("/api/v3/projects", json=body)
+
+    @mcp.tool()
+    async def update_project(
+        project_id: str,
+        name: str | None = None,
+        description: str | None = None,
+        public: bool | None = None,
+        status: str | None = None,
+        status_explanation: str | None = None,
+    ) -> dict:
+        """Update an existing project's attributes.
+
+        Args:
+            project_id: Numeric project ID or string identifier.
+            name: New display name.
+            description: New description text.
+            public: Set visibility (True = public, False = private).
+            status: Project status code: 'on_track', 'at_risk', 'off_track', 'on_hold', 'finished', 'discontinued'.
+            status_explanation: Explanation text for the status.
+        """
+        body: dict = {}
+        if name is not None:
+            body["name"] = name
+        if description is not None:
+            body["description"] = {"raw": description}
+        if public is not None:
+            body["public"] = public
+        if status is not None:
+            body["statusExplanation"] = {"raw": status_explanation or ""}
+            body["_links"] = {"status": {"href": f"/api/v3/project_statuses/{status}"}}
+        return await client.patch(f"/api/v3/projects/{project_id}", json=body)
+
+    @mcp.tool()
+    async def delete_project(project_id: str) -> str:
+        """Delete a project. This action is irreversible.
+
+        Args:
+            project_id: Numeric project ID or string identifier of the project to delete.
+        """
+        await client.delete(f"/api/v3/projects/{project_id}")
+        return f"Project '{project_id}' deleted successfully."
