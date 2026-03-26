@@ -1,0 +1,86 @@
+{
+  "manifest_version": "0.3",
+  "name": "openproject-mcp",
+  "display_name": "OpenProject MCP",
+  "version": "0.1.0",
+  "description": "Manage OpenProject projects, work packages, users and versions through AI assistants",
+  "long_description": "Connect Claude, Cursor, or any MCP client directly to your OpenProject instance.\n\nManage your entire project workflow through natural language:\n- **Projects** — list, create, update, delete\n- **Work Packages** — create tasks/bugs/features, update status, assign users, add comments\n- **Users** — list team members, view profiles\n- **Versions** — manage sprints and milestones\n- **Statuses, Types, Priorities** — reference data lookup\n\n**Delete protection:** All destructive actions require explicit user confirmation before executing.\n\n**29 tools** covering the full OpenProject REST API.",
+  "author": {
+    "name": "Voyage Software Technologies",
+    "url": "https://voyagesoftwaretech.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rharikrishnan84/vst-openproject-mcp"
+  },
+  "homepage": "https://github.com/rharikrishnan84/vst-openproject-mcp",
+  "documentation": "https://github.com/rharikrishnan84/vst-openproject-mcp#readme",
+  "support": "https://github.com/rharikrishnan84/vst-openproject-mcp/issues",
+  "license": "MIT",
+  "keywords": ["openproject", "project-management", "tasks", "work-packages", "mcp"],
+  "server": {
+    "type": "python",
+    "entry_point": "src/openproject_mcp/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--project", "${__dirname}", "openproject-mcp"],
+      "env": {
+        "OPENPROJECT_URL": "${user_config.openproject_url}",
+        "OPENPROJECT_API_TOKEN": "${user_config.openproject_api_token}"
+      }
+    }
+  },
+  "user_config": {
+    "openproject_url": {
+      "type": "string",
+      "title": "OpenProject URL",
+      "description": "Base URL of your OpenProject instance (e.g. https://projects.example.com)",
+      "required": true,
+      "placeholder": "https://projects.example.com"
+    },
+    "openproject_api_token": {
+      "type": "string",
+      "title": "API Token",
+      "description": "Personal API access token. Get it from My Account → Access Tokens in OpenProject.",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    { "name": "list_projects",                "description": "List all accessible projects" },
+    { "name": "get_project",                  "description": "Get project details by ID or identifier" },
+    { "name": "create_project",               "description": "Create a new project" },
+    { "name": "update_project",               "description": "Update project name, description or status" },
+    { "name": "delete_project",               "description": "Delete a project (requires user confirmation)" },
+    { "name": "list_work_packages",           "description": "List work packages with optional filters" },
+    { "name": "get_work_package",             "description": "Get full details of a work package" },
+    { "name": "create_work_package",          "description": "Create a new work package" },
+    { "name": "update_work_package",          "description": "Update work package attributes" },
+    { "name": "delete_work_package",          "description": "Delete a work package (requires user confirmation)" },
+    { "name": "list_work_package_activities", "description": "Get work package comments and change history" },
+    { "name": "add_work_package_comment",     "description": "Add a comment to a work package" },
+    { "name": "list_work_package_relations",  "description": "List relations for a work package" },
+    { "name": "create_work_package_relation", "description": "Create a relation between two work packages" },
+    { "name": "get_current_user",             "description": "Get the authenticated user profile" },
+    { "name": "list_users",                   "description": "List all users (requires admin)" },
+    { "name": "get_user",                     "description": "Get a user by ID" },
+    { "name": "list_project_members",         "description": "List project members with roles" },
+    { "name": "list_statuses",                "description": "List all work package statuses" },
+    { "name": "get_status",                   "description": "Get a status by ID" },
+    { "name": "list_types",                   "description": "List all work package types globally" },
+    { "name": "list_project_types",           "description": "List types enabled for a project" },
+    { "name": "get_type",                     "description": "Get a type by ID" },
+    { "name": "list_priorities",              "description": "List all priorities" },
+    { "name": "get_priority",                 "description": "Get a priority by ID" },
+    { "name": "list_versions",                "description": "List versions/sprints in a project" },
+    { "name": "get_version",                  "description": "Get a version by ID" },
+    { "name": "create_version",               "description": "Create a project version or milestone" },
+    { "name": "update_version",               "description": "Update a version" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  }
+}
