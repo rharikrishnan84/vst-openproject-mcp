@@ -192,14 +192,42 @@ def register(mcp: FastMCP, client: OpenProjectClient) -> None:
         return await client.patch(f"/api/v3/work_packages/{work_package_id}", json=body)
 
     @mcp.tool()
-    async def delete_work_package(work_package_id: int) -> str:
-        """Delete a work package permanently.
+    async def delete_work_package(work_package_id: int, confirm: bool = False) -> str:
+        """Delete a work package permanently. This action is irreversible.
+
+        IMPORTANT: Always call this first WITHOUT confirm to show the user what will be deleted.
+        Only pass confirm=True after the user has explicitly approved the deletion.
 
         Args:
             work_package_id: Numeric ID of the work package to delete.
+            confirm: Must be True to actually delete. Defaults to False (preview only).
         """
+        wp = await client.get(f"/api/v3/work_packages/{work_package_id}")
+        subject  = wp.get("subject", f"#{work_package_id}")
+        status   = wp.get("_links", {}).get("status", {}).get("title", "unknown")
+        wp_type  = wp.get("_links", {}).get("type", {}).get("title", "")
+        project  = wp.get("_links", {}).get("project", {}).get("title", "")
+        assignee = wp.get("_links", {}).get("assignee", {}).get("title", "unassigned")
+
+        if not confirm:
+            return (
+                f"[!] CONFIRMATION REQUIRED\n"
+                f"\n"
+                f"You are about to permanently delete:\n"
+                f"  #{work_package_id}  {subject}\n"
+                f"  Type    : {wp_type}\n"
+                f"  Status  : {status}\n"
+                f"  Project : {project}\n"
+                f"  Assignee: {assignee}\n"
+                f"\n"
+                f"This action CANNOT be undone.\n"
+                f"\n"
+                f"Please ask the user: \"Are you sure you want to delete work package #{work_package_id} '{subject}'?\"\n"
+                f"If they confirm, call delete_work_package(work_package_id={work_package_id}, confirm=True)."
+            )
+
         await client.delete(f"/api/v3/work_packages/{work_package_id}")
-        return f"Work package #{work_package_id} deleted successfully."
+        return f"Work package #{work_package_id} '{subject}' has been permanently deleted."
 
     @mcp.tool()
     async def list_work_package_activities(work_package_id: int) -> dict:

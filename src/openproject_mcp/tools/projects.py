@@ -84,11 +84,35 @@ def register(mcp: FastMCP, client: OpenProjectClient) -> None:
         return await client.patch(f"/api/v3/projects/{project_id}", json=body)
 
     @mcp.tool()
-    async def delete_project(project_id: str) -> str:
-        """Delete a project. This action is irreversible.
+    async def delete_project(project_id: str, confirm: bool = False) -> str:
+        """Delete a project permanently. This action is irreversible and removes all work packages inside.
+
+        IMPORTANT: Always call this first WITHOUT confirm to show the user what will be deleted.
+        Only pass confirm=True after the user has explicitly approved the deletion.
 
         Args:
             project_id: Numeric project ID or string identifier of the project to delete.
+            confirm: Must be True to actually delete. Defaults to False (preview only).
         """
+        project = await client.get(f"/api/v3/projects/{project_id}")
+        name = project.get("name", project_id)
+        identifier = project.get("identifier", "")
+
+        if not confirm:
+            return (
+                f"[!] CONFIRMATION REQUIRED\n"
+                f"\n"
+                f"You are about to permanently delete:\n"
+                f"  Project : {name}\n"
+                f"  ID      : {project_id}\n"
+                f"  URL key : {identifier}\n"
+                f"\n"
+                f"This will delete ALL work packages, versions, and data inside this project.\n"
+                f"This action CANNOT be undone.\n"
+                f"\n"
+                f"Please ask the user: \"Are you sure you want to delete the project '{name}'?\"\n"
+                f"If they confirm, call delete_project(project_id='{project_id}', confirm=True)."
+            )
+
         await client.delete(f"/api/v3/projects/{project_id}")
-        return f"Project '{project_id}' deleted successfully."
+        return f"Project '{name}' (ID: {project_id}) has been permanently deleted."
