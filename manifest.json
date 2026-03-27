@@ -2,9 +2,9 @@
   "manifest_version": "0.3",
   "name": "openproject-mcp",
   "display_name": "OpenProject MCP",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Manage OpenProject projects, work packages, users and versions through AI assistants",
-  "long_description": "Connect Claude, Cursor, or any MCP client directly to your OpenProject instance.\n\nManage your entire project workflow through natural language:\n- **Projects** — list, create, update, delete\n- **Work Packages** — create tasks/bugs/features, update status, assign users, add comments\n- **Users** — list team members, view profiles\n- **Versions** — manage sprints and milestones\n- **Statuses, Types, Priorities** — reference data lookup\n\n**Delete protection:** All destructive actions require explicit user confirmation before executing.\n\n**29 tools** covering the full OpenProject REST API.",
+  "long_description": "Connect Claude, Cursor, or any MCP client directly to your OpenProject instance.\n\nManage your entire project workflow through natural language:\n- **Projects** — list, create, update, delete\n- **Work Packages** — create tasks/bugs/features, update status, assign users, add comments\n- **Users** — list team members, view profiles\n- **Versions** — manage sprints and milestones\n- **Time Entries** — log time, list and filter entries, manage activities\n- **Statuses, Types, Priorities** — reference data lookup\n\n**Delete protection:** All destructive actions require explicit user confirmation before executing.\n\n**35 tools** covering the full OpenProject REST API.",
   "author": {
     "name": "Voyage Software Technologies",
     "url": "https://voyagesoftwaretech.com"
@@ -75,7 +75,13 @@
     { "name": "list_versions",                "description": "List versions/sprints in a project" },
     { "name": "get_version",                  "description": "Get a version by ID" },
     { "name": "create_version",               "description": "Create a project version or milestone" },
-    { "name": "update_version",               "description": "Update a version" }
+    { "name": "update_version",               "description": "Update a version" },
+    { "name": "list_time_entries",            "description": "List time entries with optional filters by work package, project, user, or date" },
+    { "name": "get_time_entry",               "description": "Get full details of a single time entry" },
+    { "name": "create_time_entry",            "description": "Log time against a work package" },
+    { "name": "update_time_entry",            "description": "Update an existing time entry" },
+    { "name": "delete_time_entry",            "description": "Delete a time entry (requires user confirmation)" },
+    { "name": "list_time_entry_activities",   "description": "List available time entry activity types (Development, Testing, etc.)" }
   ],
   "compatibility": {
     "platforms": ["darwin", "win32", "linux"],

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "openproject-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP server for the OpenProject REST API — works with Claude, Cursor, and any MCP-compatible client"
 readme = "README.md"
 requires-python = ">=3.11"
